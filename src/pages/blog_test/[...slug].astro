@@ -1,0 +1,72 @@
+---
+import { undefined } from 'astro:schema';
+import { getCollection } from 'astro:content';
+import { getEntry, render } from 'astro:content';
+import { marked } from 'marked';
+
+
+export async function getStaticPaths() {
+    const blog = await getCollection('blog');
+    console.log("0:",blog)
+    const pages = [
+        {
+            slug: "ok",
+            title: "Astro Store",
+            text: "Welcome to the Astro store!",
+        },
+        {
+            slug: undefined,
+            title: "Astro Store doc",
+            text: "Welcome to the Astro store!",
+        },
+        
+        {
+            slug: blog[0].id,
+            title: "blog",
+            // text: blog[0].rendered.html ,
+            text: blog[0].body ,
+        },
+    ];
+    return blog.map(({ id, rendered,body }) => {
+        return {
+            params: {slug: id },
+            props: { content:rendered.html,body:body ,id:id},
+        };
+    });
+}
+
+const { id,content,body } = Astro.props;
+const htmlContent = marked(body);
+const blog = await getCollection('blog');
+const post = blog[0]; // 假设只有一个 Markdown 文件
+const  Content2  = await post.rendered.html;
+
+const entry = await getEntry('blog', id);
+console.log("entry2:",entry)
+console.log("id2:",id)
+const { Content, headings } = await render(entry);
+console.log("con",Content,"head",headings)
+---
+
+<html>
+    <head>
+    </head>
+    <body>
+        <Content2 />
+        <div set:html={content} />
+
+        <div class="markdown-content">
+            <Fragment set:html={body} />
+        </div>
+        <div>{htmlContent}</div>
+
+        <div class="markdown-content">
+            <Fragment set:html={htmlContent} />
+        </div>
+
+        <Content />
+
+        <p>Published on: {entry}  --{headings}</p>
+
+    </body>
+</html>

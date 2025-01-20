@@ -1,0 +1,74 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = '' } = Astro.props;
+
+// 递归获取文件树结构
+function getFileTree() {
+  // TODO: 实现文件树获取逻辑
+  return [
+    {
+      name: '入门指南',
+      path: '/docs/started',
+      children: [
+        { name: '快速开始', path: '/docs/started/start' },
+        { name: '基础概念', path: '/docs/started/concepts' },
+      ],
+    },
+    {
+      name: '进阶教程',
+      path: '/docs/advanced',
+      children: [
+        { name: '自定义配置', path: '/docs/advanced/configuration' },
+        { name: '插件开发', path: '/docs/advanced/plugins' },
+      ],
+    },
+  ];
+}
+
+const fileTree = getFileTree();
+---
+
+<nav class="file-navigation">
+  <h3 class="text-lg font-semibold mb-4">文档导航</h3>
+  <ul class="space-y-2">
+    {fileTree.map((item) => (
+      <li>
+        <a
+          href={item.path}
+          class:list={[
+            'block py-1 px-2 rounded hover:bg-gray-100',
+            { 'bg-gray-100 font-medium': currentPath.startsWith(item.path) },
+          ]}
+        >
+          {item.name}
+        </a>
+        {item.children && (
+          <ul class="ml-4 mt-1 space-y-1">
+            {item.children.map((child) => (
+              <li>
+                <a
+                  href={child.path}
+                  class:list={[
+                    'block py-1 px-2 rounded hover:bg-gray-100 text-sm',
+                    { 'bg-gray-100 font-medium': currentPath === child.path },
+                  ]}
+                >
+                  {child.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .file-navigation {
+    @apply text-gray-700;
+  }
+</style>

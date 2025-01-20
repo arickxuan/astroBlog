@@ -1,0 +1,38 @@
+---
+// ViewTransitions 已弃用，改用 transition:animate
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body>
+    <div class="flex min-h-screen">
+      <!-- 左侧大纲导航 -->
+      <aside class="w-64 border-r border-gray-200 p-4 overflow-y-auto">
+      </aside>
+
+      <!-- 中间内容区域 -->
+      <main class="flex-1 p-8 overflow-y-auto">
+      </main>
+
+      <!-- 右侧文件导航 -->
+      <aside class="w-64 border-l border-gray-200 p-4 overflow-y-auto">
+        <!--//<slot name="file-nav" /> -->
+      </aside>
+    </div>
+  </body>
+</html>
