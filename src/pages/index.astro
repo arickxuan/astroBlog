@@ -1,0 +1,11 @@
+---
+//import MainLayout from '../layouts/MainLayout.astro';
+import IndexMainLayout from '../layouts/IndexMainLayout.astro';
+import fs from 'fs/promises';
+
+const content = await fs.readFile('./src/content/index.md', 'utf-8');
+---
+
+<IndexMainLayout content={content} /> 
+
+<!--<div>{content}</div>-->

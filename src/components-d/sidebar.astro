@@ -1,0 +1,96 @@
+---
+const { currentPath } = Astro.props;
+
+// 获取所有 markdown 文件
+const allDocs = await Astro.glob('../pages/docs/**/*.md');
+
+// 从文件路径中提取标题
+function getTitle(filePath) {
+  const fileName = filePath.split('/').pop().replace(/\.md$/, '');
+  return fileName
+    .replace(/[-_]/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+// 构建目录树结构
+function buildTree(paths) {
+  const tree = {};
+  
+  paths.forEach(doc => {
+    const parts = doc.file.split('/docs/')[1].split('/');
+    let current = tree;
+    
+    parts.forEach((part, i) => {
+      if (i === parts.length - 1) {
+        // 文件节点
+        current[part] = {
+          type: 'file',
+          path: doc.url,
+          title: getTitle(doc.file),
+          id: doc.id
+        };
+      } else {
+        // 目录节点
+        if (!current[part]) {
+          current[part] = {
+            type: 'directory',
+            children: {},
+            title: part
+              .replace(/[-_]/g, ' ')
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')
+          };
+        }
+        current = current[part].children;
+      }
+    });
+  });
+  
+  return tree;
+}
+
+const tree = buildTree(allDocs);
+
+// 递归渲染目录树组件
+const TreeView = ({ tree, level = 0, currentPath }) => {
+  // 计算缩进类名
+  const indentClass = `pl-${level * 4}`;
+  
+  return (
+    <ul class={indentClass}>
+      {Object.entries(tree).map(([key, node]) => (
+        <li class="my-2">
+          {node.type === 'file' ? (
+            <a 
+              href={node.path} 
+              class={`hover:text-blue-600 ${
+                node.id === currentPath 
+                  ? 'text-blue-600 font-medium'
+                  : 'text-gray-600'
+              }`}
+            >
+              {node.title}
+            </a>
+          ) : (
+            <>
+              <div class="font-medium text-gray-900">{node.title}</div>
+              <TreeView 
+                tree={node.children} 
+                level={level + 1}
+                currentPath={currentPath}
+              />
+            </>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+};
+---
+
+<nav class="p-4">
+  <TreeView tree={tree} currentPath={currentPath} />
+</nav>

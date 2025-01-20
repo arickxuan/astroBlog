@@ -1,0 +1,55 @@
+---
+const { headings } = Astro.props;
+
+// 构建嵌套的目录结构
+function buildToc(headings) {
+  const toc = [];
+  const parentHeadings = new Map();
+  
+  headings.forEach(heading => {
+    const item = {
+      ...heading,
+      children: []
+    };
+    
+    if (heading.depth === 2) {
+      toc.push(item);
+      parentHeadings.set(2, item);
+    } else {
+      const parent = parentHeadings.get(heading.depth - 1);
+      if (parent) {
+        parent.children.push(item);
+        parentHeadings.set(heading.depth, item);
+      }
+    }
+  });
+  
+  return toc;
+}
+
+const tableOfContents = buildToc(headings);
+---
+
+<nav class="p-4">
+  <h2 class="text-lg font-semibold mb-4">目录</h2>
+  <ul class="space-y-2">
+    {tableOfContents.map(heading => (
+      <li>
+        <a href={`#${heading.slug}`} class="text-gray-600 hover:text-gray-900">
+          {heading.text}
+        </a>
+        {heading.children.length > 0 && (
+          <ul class="pl-4 mt-2 space-y-2">
+            {heading.children.map(subheading => (
+              <li>
+                <a href={`#${subheading.slug}`} class="text-gray-500 hover:text-gray-900">
+                  {subheading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>

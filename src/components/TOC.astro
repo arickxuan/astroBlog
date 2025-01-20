@@ -1,0 +1,21 @@
+---
+// 提取 md 内容的标题
+const { content } = Astro.props;
+
+const headings = content.match(/#+\s.+/g) || [];
+---
+
+<aside>
+  <ul>
+    {headings.map(heading => {
+      const level = heading.match(/^#+/)[0].length;
+      const text = heading.replace(/^#+\s/, '');
+      const id = text.toLowerCase().replace(/\s+/g, '-');
+      return (
+        <li style={{ marginLeft: `${(level - 1) * 10}px` }}>
+          <a href={`#${id}`}>{text}</a>
+        </li>
+      );
+    })}
+  </ul>
+</aside>

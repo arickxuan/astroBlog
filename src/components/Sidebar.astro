@@ -1,0 +1,149 @@
+---
+import { getCollection } from "astro:content";
+const files = await getCollection("lession");
+console.log(files);
+// 从文件路径中提取标题
+function getTitle(filePath) {
+    const fileName = filePath.split("/").pop().replace(/\.md$/, "");
+    return fileName
+        .replace(/[-_]/g, " ")
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
+// 构建目录树结构
+function buildTree(paths) {
+    const tree = {};
+
+    paths.forEach((doc) => {
+        const parts = doc.file.split("/");
+        let current = tree;
+
+        parts.forEach((part, i) => {
+            console.log(part, i);
+            if (i === parts.length - 1) {
+                // 文件节点
+                current[part] = {
+                    type: "file",
+                    path: doc.url,
+                    title: getTitle(doc.file),
+                    id: doc.id,
+                };
+            } else {
+                // 目录节点
+                if (!current[part]) {
+                    current[part] = {
+                        type: "directory",
+                        children: {},
+                        title: part
+                            .replace(/[-_]/g, " ")
+                            .split(" ")
+                            .map(
+                                (word) =>
+                                    word.charAt(0).toUpperCase() +
+                                    word.slice(1),
+                            )
+                            .join(" "),
+                    };
+                }
+                current = current[part].children;
+            }
+        });
+
+        parts.forEach((part, index) => {
+            if (!current[part]) {
+                current[part] = {
+                    children: {},
+                    isFile: index === parts.length - 1,
+                };
+            }
+            current = current[part].children;
+        });
+    });
+    console.log(tree);
+    return tree;
+}
+
+const tree = buildTree(files);
+---
+
+<style>
+    .folder {
+        cursor: pointer;
+        user-select: none;
+    }
+    .hidden {
+        display: none;
+    }
+</style>
+
+<nav>
+    <ul>
+        {
+            Object.entries(tree).map(([key, value]) => (
+                <li>
+                    {value.isFile ? (
+                        <a href={`/${key}`}>{key}</a>
+                    ) : (
+                        <div>
+                            <span class="folder" onclick="toggleFolder(this)">
+                                📁 {key}
+                            </span>
+                            <ul class="hidden">
+                                {Object.entries(value.children).map(
+                                    ([childKey, childValue]) => (
+                                        <li>
+                                            {childValue.isFile ? (
+                                                <a href={`/${key}/${childKey}`}>
+                                                    {childKey}
+                                                </a>
+                                            ) : (
+                                                <div>
+                                                    <span
+                                                        class="folder"
+                                                        onclick="toggleFolder(this)"
+                                                    >
+                                                        📂 {childKey}
+                                                    </span>
+                                                    <ul class="hidden">
+                                                        {Object.entries(
+                                                            childValue.children,
+                                                        ).map(
+                                                            ([
+                                                                grandChildKey,
+                                                            ]) => (
+                                                                <li>
+                                                                    <a
+                                                                        href={`/${key}/${childKey}/${grandChildKey}`}
+                                                                    >
+                                                                        {
+                                                                            grandChildKey
+                                                                        }
+                                                                    </a>
+                                                                </li>
+                                                            ),
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </li>
+                                    ),
+                                )}
+                            </ul>
+                        </div>
+                    )}
+                </li>
+            ))
+        }
+    </ul>
+</nav>
+
+<script>
+    function toggleFolder(element) {
+        const nextUl = element.nextElementSibling;
+        if (nextUl) {
+            nextUl.classList.toggle("hidden");
+        }
+    }
+</script>
