@@ -6,13 +6,13 @@ import { glob, file } from 'astro/loaders';
 
 // 3. 定义你的集合
 const blog = defineCollection({
-    loader: glob({ pattern: "**/*.md", base: "./src/data/blog" }),
+    loader: glob({ pattern: "**/*.md", base: "./data/blog" }),
     // schema: z.object({
     //     name: z.string(),
     //     title: z.string(),
     // }),
 });
-const docs = defineCollection({ loader: glob({ pattern: "**/*.md", base: "./src/data/docs" }), });
+const docs = defineCollection({ loader: glob({ pattern: "**/*.md", base: "./data/docs" }), });
 
 
 

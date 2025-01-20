@@ -1,0 +1,31 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+const { title,Md } = Astro.props;
+const { frontmatter, url } = Astro.props;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <BaseHead title={title}/>
+  </head>
+  <body>
+    <nav>
+      <a href="#">主页</a>
+      <a href="#">文章</a>
+      <a href="#">联系</a>
+    </nav>
+    <h1>{title}</h1>
+    <article>
+      <slot /> <!-- 你的内容会被插入到这里 -->
+      <Md></Md>
+    </article>
+    <Footer />
+  </body>
+  <style>
+    h1 {
+      font-size: 2rem;
+    }
+  </style>
+</html>

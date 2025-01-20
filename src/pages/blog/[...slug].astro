@@ -2,6 +2,7 @@
 import { undefined } from "astro:schema";
 import { getCollection } from "astro:content";
 import { getEntry, render } from "astro:content";
+import DocLayout from '../../layouts/DocLayout.astro';
 
 export async function getStaticPaths() {
     const blog = await getCollection("blog");
@@ -29,10 +30,6 @@ const { id, Content, body, headings } = Astro.props;
 
 console.log("head", headings);
 ---
+<DocLayout title={id} Md={Content}>
 
-<html>
-    <head> </head>
-    <body>
-        <Content></Content>
-    </body>
-</html>
+</DocLayout>

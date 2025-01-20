@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import tailwind from '@astrojs/tailwind';
+import remarkToc from 'remark-toc';
+import { rehypeAccessibleEmojis } from 'rehype-accessible-emojis';
 
 export default defineConfig({
   integrations: [
@@ -10,4 +12,10 @@ export default defineConfig({
       config: { content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'] },
     }),
   ],
+  markdown: {
+    syntaxHighlight: 'prism',
+    gfm: true,
+    remarkPlugins: [ [remarkToc, { heading: 'toc', maxDepth: 3 } ] ],
+    rehypePlugins: [rehypeAccessibleEmojis],
+  },
 });
