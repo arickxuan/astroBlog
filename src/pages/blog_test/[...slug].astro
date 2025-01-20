@@ -36,6 +36,9 @@ export async function getStaticPaths() {
 }
 
 const { id,content,body } = Astro.props;
+const { slug } = Astro.params;
+console.log("slug",slug)
+console.log("url",Astro.url)
 const htmlContent = marked(body);
 const blog = await getCollection('blog');
 const post = blog[0]; // 假设只有一个 Markdown 文件

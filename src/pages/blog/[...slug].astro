@@ -27,8 +27,10 @@ export async function getStaticPaths() {
 }
 
 const { id, Content, body, headings } = Astro.props;
-
+const { slug } = Astro.params;
+console.log("slug",slug)
 console.log("head", headings);
+console.log("url",Astro.url)
 ---
 <DocLayout title={id} Md={Content}>
 
